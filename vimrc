@@ -101,6 +101,7 @@ Plug 'Shougo/ddc.vim'
 " An ecosystem of Vim/Neovim which allows developers to write cross-platform
 " plugins in Deno
 Plug 'vim-denops/denops.vim'
+Plug 'Shougo/ddc-ui-native'
 " Heading matcher for ddc.vim
 Plug 'Shougo/ddc-matcher_head'
 " Matched rank order sorter for ddc.vim
@@ -108,19 +109,20 @@ Plug 'Shougo/ddc-sorter_rank'
 " Fuzzy matcher, sorter, and conveter for ddc.vim
 Plug 'tani/ddc-fuzzy'
 " Around completion for ddc.vim
-Plug 'Shougo/ddc-around'
+Plug 'Shougo/ddc-source-around'
 " vim-lsp source for ddc.vim
-Plug 'shun/ddc-vim-lsp'
+Plug 'shun/ddc-source-vim-lsp'
 " ultisnips source for ddc.vim
 Plug 'matsui54/ddc-ultisnips'
 " A source for ddc.vim to gather candidates from tmux panes
-Plug 'delphinus/ddc-tmux'
+Plug 'delphinus/ddc-source-tmux'
 " Buffer source for ddc.vim
-Plug 'matsui54/ddc-buffer'
+Plug 'matsui54/ddc-source-buffer'
 " Powerful and performant file name completion for ddc.vim
-Plug 'LumaKernel/ddc-file'
+Plug 'LumaKernel/ddc-source-file'
 " ddc source for dictionary
-Plug 'matsui54/ddc-dictionary'
+" BUG: dictionary not work
+Plug 'matsui54/ddc-source-dictionary'
 " }}}
 " The ultimate snippet solution for Vim
 Plug 'sirver/ultisnips'
@@ -154,7 +156,7 @@ Plug 'igankevich/mesonic'
 Plug 'brooth/far.vim'
 " A command-line fuzzy finder
 Plug 'junegunn/fzf'
-Plug $HOME . '/Documents/projects/repos/vim-fly'
+Plug $HOME . '/Documents/vim-fly'
 " A light and configurable statusline/tabline plugin for Vim
 Plug 'itchyny/lightline.vim'
 " A (Neo)vim plugin for formatting code.
@@ -328,6 +330,7 @@ let g:lsp_settings['pyright-langserver']['workspace_config'] = {
                 \}
 " }}}
 " ddc.vim {{{
+call ddc#custom#patch_global('ui', 'native')
 call ddc#custom#patch_global('sources', [
             \'file',
             \'vim-lsp',
@@ -335,7 +338,6 @@ call ddc#custom#patch_global('sources', [
             \'around',
             \'buffer',
             \'tmux',
-            \'dictionary',
             \])
 call ddc#custom#patch_global('sourceOptions', {
             \'_': {
@@ -349,7 +351,6 @@ call ddc#custom#patch_global('sourceOptions', {
             \'vim-lsp': {'mark': 'lsp', 'minAutoCompleteLength': 1},
             \'tmux': {'mark': 'tmux'},
             \'buffer': {'mark': 'B'},
-            \'dictionary': {'mark': 'D', 'ignoreCase': v:false},
             \'file': {
                 \'mark': 'F',
                 \'isVolatile': v:true,
@@ -366,11 +367,6 @@ call ddc#custom#patch_global('sourceParams', {
                 \'fromAltBuf': v:true,
                 \'forceCollect': v:true,
                 \},
-            \'dictionary': {
-                \'dictPaths': ['/usr/share/dict/words'],
-                \'smartCase': v:true,
-                \'showMenu': v:false,
-                \},
             \'tmux': {'excludeCurrentPane': v:true},
             \'file': {
                 \'disableMenu': v:true,
@@ -381,12 +377,12 @@ call ddc#custom#patch_global('sourceParams', {
 
 " <TAB>: completion.
 inoremap <silent><expr> <TAB>
-\ ddc#map#pum_visible() ? '<C-n>' :
+\ pumvisible() ? '<C-n>' :
 \ (col('.') <= 1 <Bar><Bar> getline('.')[col('.') - 2] =~# '\s') ?
 \ '<TAB>' : ddc#map#manual_complete()
 
 " <S-TAB>: completion back.
-inoremap <expr><S-TAB>  ddc#map#pum_visible() ? '<C-p>' : '<C-h>'
+inoremap <expr><S-TAB>  pumvisible() ? '<C-p>' : '<C-h>'
 
 " Use ddc.
 call ddc#enable()
